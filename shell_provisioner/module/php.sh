@@ -11,16 +11,30 @@ sed -i 's/^user = www-data/user = vagrant/' /etc/php/7.0/fpm/pool.d/www.conf
 sed -i 's/^group = www-data/group = vagrant/' /etc/php/7.0/fpm/pool.d/www.conf
 
 # xdebug
-#cat << EOF >>/etc/php/7.0/mods-available/xdebug.ini
-#xdebug.remote_enable=1
-#xdebug.remote_autostart=1
-#xdebug.remote_host=192.168.33.1
-#xdebug.max_nesting_level=250
-#; xdebug.profiler_enable=1
-#; xdebug.profiler_output_dir=/vagrant/dumps
-#EOF
+mkdir xdebug
+cd xdebug
+wget http://xdebug.org/files/xdebug-2.4.0rc2.tgz
+tar -xvzf xdebug-2.4.0rc2.tgz
+cd xdebug-2.4.0RC2
+phpize
+./configure
+make
+cp modules/xdebug.so /usr/lib/php/20151012
+cd ..
+rm -rf xdebug
+echo "zend_extension=/usr/lib/php/20151012/xdebug.so" > /etc/php/7.0/mods-available/xdebug.ini
+ln -s /etc/php/7.0/mods-available/xdebug.ini /etc/php/7.0/cli/conf.d/30-xdebug.ini
+ln -s /etc/php/7.0/mods-available/xdebug.ini /etc/php/7.0/fpm/conf.d/30-xdebug.ini
+cat << EOF >>/etc/php/7.0/mods-available/xdebug.ini
+xdebug.remote_enable=1
+xdebug.remote_autostart=1
+xdebug.remote_host=192.168.33.1
+xdebug.max_nesting_level=250
+; xdebug.profiler_enable=1
+; xdebug.profiler_output_dir=/vagrant/dumps
+EOF
 
-service php7-fpm restart
+service php7.0-fpm restart
 
 # composer
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin
