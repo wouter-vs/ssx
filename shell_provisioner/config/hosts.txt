@@ -1,0 +1,5 @@
+# Add a line to your hosts file.
+# This must match the values for GUEST_IP and APP_DOMAIN set in run.sh
+192.168.33.10 ssx.dev.intracto.com
+192.168.33.10 phpmyadmin.ssx.dev.intracto.com
+192.168.33.10 roundcube.ssx.dev.intracto.com
