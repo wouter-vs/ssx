@@ -3,6 +3,12 @@
 
 VAGRANTFILE_API_VERSION = "2"
 
+module OS
+    def OS.windows?
+        (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
+    end
+end
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.define :ssx do |ssx_config|
         ssx_config.vm.box = "Debian81"
@@ -22,8 +28,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         # allow external connections to the machine
         #ssx_config.vm.forward_port 80, 8080
 
-        # Shared folder over NFS
-        ssx_config.vm.synced_folder ".", "/vagrant", type: "nfs"
+        # Shared folder over NFS unless Windows
+        if OS.windows?
+            ssx_config.vm.synced_folder ".", "/vagrant"
+        else
+            ssx_config.vm.synced_folder ".", "/vagrant", type: "nfs", mount_options: ['rw', 'vers=3', 'tcp', 'fsc' ,'actimeo=2']
+        end
 
         ssx_config.vm.network "private_network", ip: "192.168.33.10"
 
